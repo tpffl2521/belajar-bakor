@@ -3,184 +3,130 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Game Korea — Romaja (Mobile)</title>
+<title>Korea Mini — Romaja (2 Pemain)</title>
 <style>
   :root{
-    --bg:#fff;
-    --card:#ffffff;
-    --ink:#0f172a;
-    --muted:#64748b;
-    --accent:#fb7185;     /* pink */
-    --accent2:#60a5fa;    /* biru */
-    --good:#22c55e;
-    --bad:#ef4444;
-    --ring:#00000012;
-    --shadow:0 10px 30px rgba(2,6,23,.06);
-    --radius:18px;
+    --card:#fff; --ink:#0f172a; --muted:#64748b;
+    --accent:#fb7185; --accent2:#60a5fa;
+    --p1:#22c55e; --p2:#f59e0b;
+    --good:#10b981; --bad:#ef4444;
+    --ring:#00000012; --shadow:0 10px 30px rgba(2,6,23,.06); --r:18px;
   }
   *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0;
-    font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;
-    color:var(--ink);
+  body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);
     background:
       radial-gradient(1400px 900px at 10% -10%, #ffe4e6 0%, transparent 60%),
       radial-gradient(1100px 800px at 110% -10%, #dbeafe 0%, transparent 60%),
-      var(--bg);
+      #fff;
     padding-bottom: env(safe-area-inset-bottom);
   }
-  .wrap{max-width:720px;margin:auto;padding:12px 16px 20px}
-  /* ====== HEADER / TABS ====== */
-  header{
-    background:var(--card);
-    border-radius:var(--radius);
-    box-shadow:var(--shadow);
-    padding:12px;
-  }
-  h1{
-    margin:0 0 10px 0;
-    font-size:clamp(18px, 2.8vw, 22px);
-    letter-spacing:.2px;
-  }
-  .tabs{
-    display:grid;
-    grid-template-columns:1fr 1fr 1fr;
-    gap:8px;
-    background:#f1f5f9;
-    padding:6px;
-    border-radius:999px;
-  }
-  .tab{
-    appearance:none;border:0;background:transparent;
-    padding:10px 12px;border-radius:999px;
-    font-weight:700;font-size:14px;line-height:1;cursor:pointer;
-  }
+  .wrap{max-width:820px;margin:auto;padding:12px 16px 24px}
+  header{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:12px}
+  h1{margin:0 0 10px;font-size:clamp(18px,2.8vw,22px)}
+  .tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;background:#f1f5f9;padding:6px;border-radius:999px}
+  .tab{border:0;background:transparent;padding:10px 12px;border-radius:999px;font-weight:700;font-size:14px;cursor:pointer}
   .tab[aria-pressed="true"]{background:var(--accent);color:#fff}
-
-  /* ====== CARD ====== */
-  .card{
-    background:var(--card);
-    border-radius:var(--radius);
-    box-shadow:var(--shadow);
-    padding:14px;
-    margin-top:12px;
-  }
+  .card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:14px;margin-top:12px}
   .row{display:flex;flex-direction:column;gap:10px}
-  @media(min-width:720px){
-    .row{flex-direction:row;flex-wrap:wrap;align-items:center}
-  }
-  .input, .select, .btn{
-    width:100%;
-    appearance:none;
-    border:2px solid var(--ring);
-    border-radius:12px;
-    padding:12px 14px;
-    font:600 16px/1.1 inherit;
-    background:#fff;
-  }
+  @media(min-width:720px){.row{flex-direction:row;flex-wrap:wrap;align-items:center}}
+  .input,.select,.btn{width:100%;appearance:none;border:2px solid var(--ring);border-radius:12px;padding:12px 14px;font:600 16px/1.1 inherit;background:#fff}
   .btn{cursor:pointer;text-align:center}
   .btn.primary{background:var(--accent);color:#fff;border-color:transparent}
   .btn.ghost{background:#0000}
-  .hint{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+  .muted{color:var(--muted)} .tiny{font-size:12px;color:var(--muted)}
   .stat{display:flex;flex-wrap:wrap;gap:10px;font-size:14px;margin-top:8px;color:var(--muted)}
   .tag{display:inline-block;font:700 12px/1 inherit;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:999px;padding:6px 10px}
 
-  /* ====== FLASH ====== */
+  /* QUIZ */
+  .score{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
+  .score .box{border:2px solid var(--ring);border-radius:12px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;font-weight:800}
+  .p1{border-color:#bbf7d0;background:#f0fdf4} .p2{border-color:#fde68a;background:#fffbeb}
+  .turn{display:inline-flex;gap:8px;align-items:center}
+  .turn .dot{width:10px;height:10px;border-radius:50%}
+  .dot.p1{background:var(--p1)} .dot.p2{background:var(--p2)}
+  .question{font-weight:800;text-align:center;margin-top:6px;font-size:clamp(20px,6vw,36px)}
+  .choices{display:grid;gap:10px;margin-top:12px}
+  .choice{border:2px solid var(--ring);border-radius:14px;background:#fff;padding:14px;font:600 16px/1.2 inherit;text-align:left}
+  .choice.correct{border-color:var(--good)} .choice.wrong{border-color:var(--bad)}
+  .foot{display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:12px;flex-wrap:wrap}
+
+  /* FLASH */
   .flip{perspective:1000px;cursor:pointer;margin-top:8px}
-  .flip-inner{
-    position:relative;transform-style:preserve-3d;transition:transform .5s;
-    min-height:160px;border-radius:16px;background:#fff;
-    display:grid;place-items:center;border:2px dashed var(--ring)
-  }
+  .flip-inner{position:relative;transform-style:preserve-3d;transition:transform .5s;min-height:160px;border-radius:16px;background:#fff;display:grid;place-items:center;border:2px dashed var(--ring)}
   .flip.flipped .flip-inner{transform:rotateY(180deg)}
   .face{position:absolute;inset:0;display:grid;place-items:center;padding:20px;backface-visibility:hidden;border-radius:16px}
   .front{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
   .back{background:#fff;transform:rotateY(180deg)}
-  .big{
-    font-weight:800;
-    text-align:center;
-    padding:6px 8px;
-    font-size:clamp(22px, 6vw, 42px);
-  }
-
-  /* ====== QUIZ ====== */
-  .question{
-    font-weight:800;text-align:center;margin-top:6px;
-    font-size:clamp(20px, 6vw, 36px)
-  }
-  .choices{display:grid;gap:10px;margin-top:12px}
-  .choice{
-    border:2px solid var(--ring);border-radius:14px;background:#fff;
-    padding:14px;font:600 16px/1.2 inherit;text-align:left;
-  }
-  .choice.correct{border-color:var(--good)}
-  .choice.wrong{border-color:var(--bad)}
-  .foot{display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:12px;flex-wrap:wrap}
-  .muted{opacity:.75}
-
-  /* Better tap targets on mobile */
-  @media (max-width:420px){
-    .choices{gap:8px}
-    .choice{padding:12px;font-size:15px}
-  }
+  .big{font-weight:800;text-align:center;padding:6px 8px;font-size:clamp(22px,6vw,42px)}
 </style>
 </head>
 <body>
 <div class="wrap">
-
-  <!-- HEADER + TABS -->
   <header>
-    <h1>🎌 Korea Mini — Romaja</h1>
-    <div class="tabs" role="tablist" aria-label="Mode">
+    <h1>🎌 Korea Mini — Romaja (2 Pemain)</h1>
+    <div class="tabs" role="tablist">
       <button id="tab-quiz"   class="tab" role="tab" aria-pressed="true">Kuis</button>
       <button id="tab-flash"  class="tab" role="tab" aria-pressed="false">Flashcard</button>
       <button id="tab-custom" class="tab" role="tab" aria-pressed="false">Kustom</button>
     </div>
   </header>
 
-  <!-- KONTROL -->
+  <!-- Kontrol -->
   <section class="card">
     <div class="row">
-      <label>
-        <div class="muted" style="font-size:12px">Kategori</div>
+      <label><div class="tiny">Kategori</div>
         <select id="category" class="select">
           <option value="vocab" selected>Kosakata</option>
           <option value="phrases">Frasa / Kalimat</option>
         </select>
       </label>
-      <label>
-        <div class="muted" style="font-size:12px">Sumber Data</div>
+      <label><div class="tiny">Sumber Data</div>
         <select id="datasrc" class="select">
           <option value="base" selected>Data Bawaan</option>
           <option value="merge">Gabung (Bawaan + Custom)</option>
           <option value="custom">Hanya Custom</option>
         </select>
       </label>
-      <label>
-        <div class="muted" style="font-size:12px">Jumlah Soal</div>
-        <select id="limit" class="select">
-          <option>10</option><option selected>15</option><option>20</option>
-        </select>
+      <label><div class="tiny">Jumlah Soal</div>
+        <select id="limit" class="select"><option>10</option><option selected>15</option><option>20</option><option>30</option></select>
       </label>
-      <label class="hint"><input type="checkbox" id="hideHangul" checked /> Sembunyikan Hangul</label>
+      <label class="tiny" style="display:flex;align-items:center;gap:8px">
+        <input type="checkbox" id="hideHangul" checked /> Sembunyikan Hangul
+      </label>
       <button id="btnStart" class="btn primary">Mulai / Reset</button>
     </div>
+
+    <!-- 2 Pemain -->
+    <div class="row" style="margin-top:10px">
+      <label><div class="tiny">Nama Pemain 1</div><input id="p1name" class="input" value="Pemain 1"></label>
+      <label><div class="tiny">Nama Pemain 2</div><input id="p2name" class="input" value="Pemain 2"></label>
+      <label class="tiny" style="display:flex;align-items:center;gap:8px">
+        <input type="checkbox" id="strictTurn" checked /> Giliran selalu bergantian (benar/tidak tetap ganti)
+      </label>
+    </div>
+
     <div class="stat">
+      <span class="tag">Sumber: <span id="activeSrc">Bawaan</span></span>
       <span>✅ Benar: <b id="right">0</b></span>
       <span>❌ Salah: <b id="wrong">0</b></span>
       <span>🔥 Streak: <b id="streak">0</b></span>
       <span>🎯 Target: <b id="target">15</b></span>
-      <span class="tag">Sumber: <span id="activeSrc">Bawaan</span></span>
     </div>
   </section>
 
-  <!-- QUIZ -->
+  <!-- Panel Kuis -->
   <section id="panel-quiz" class="card">
-    <div class="tag">Kuis ▸ Pilih arti Indonesia</div>
+    <div class="score">
+      <div class="box p1"><span id="p1label">Pemain 1</span><span id="p1score">0</span></div>
+      <div class="box p2"><span id="p2label">Pemain 2</span><span id="p2score">0</span></div>
+    </div>
+    <div class="turn tiny"><span class="dot p1"></span> Giliran: <b id="turnName" style="margin-left:6px">Pemain 1</b></div>
+
+    <div class="tag" style="margin-top:8px">Kuis ▸ Pilih arti Indonesia</div>
     <div id="hangulHint" class="muted" style="display:none;margin-top:6px;text-align:center"></div>
     <div id="question" class="question">annyeonghaseyo</div>
     <div id="choices" class="choices"></div>
+
     <div class="foot">
       <div class="row" style="gap:8px;flex-direction:row">
         <button id="speakQuiz" class="btn">🔊 Dengar Pelafalan</button>
@@ -188,12 +134,12 @@
       </div>
       <div class="row" style="gap:8px;flex-direction:row">
         <span class="muted">Soal <span id="qIndex">1</span>/<span id="qTotal">15</span></span>
-        <button id="nextQ" class="btn">Berikutnya →</button>
+        <button id="nextQ" class="btn">Lewati / Berikutnya →</button>
       </div>
     </div>
   </section>
 
-  <!-- FLASHCARD -->
+  <!-- Flashcard -->
   <section id="panel-flash" class="card" hidden>
     <div class="tag">Flashcard ▸ Romaja → Arti (ketuk kartu)</div>
     <div class="flip" id="flash">
@@ -217,9 +163,9 @@
     </div>
   </section>
 
-  <!-- KUSTOM singkat (tetap ada, minimal) -->
+  <!-- Kustom singkat -->
   <section id="panel-custom" class="card" hidden>
-    <div class="tag">Kustom Cepat</div>
+    <div class="tag">Kustom Cepat (tersimpan di perangkat)</div>
     <div class="row" style="margin-top:8px">
       <input id="inRom" class="input" placeholder="romaja (wajib)"/>
       <input id="inHan" class="input" placeholder="hangul (wajib)"/>
@@ -227,15 +173,121 @@
       <select id="inCat" class="select"><option value="vocab">Kosakata</option><option value="phrases">Frasa</option></select>
       <button id="btnAdd" class="btn primary">Tambah</button>
     </div>
-    <p class="muted" style="font-size:12px;margin:10px 0 0">Data custom disimpan di perangkat (localStorage).</p>
   </section>
 </div>
 
 <script>
-/* ========= DATA BAWAAN ========= */
-const baseVocab=[{kr:"안녕하세요",rom:"annyeonghaseyo",id:"halo/permisi"},{kr:"감사합니다",rom:"gamsahamnida",id:"terima kasih"},{kr:"사랑해",rom:"saranghae",id:"aku cinta kamu"},{kr:"네",rom:"ne",id:"iya"},{kr:"아니요",rom:"aniyo",id:"tidak"},{kr:"미안해요",rom:"mianhaeyo",id:"maaf"},{kr:"주세요",rom:"juseyo",id:"tolong berikan"},{kr:"얼마예요?",rom:"eolmayeyo?",id:"berapa harganya?"},{kr:"맛있어요",rom:"masisseoyo",id:"enak"},{kr:"괜찮아요",rom:"gwaenchanayo",id:"tidak apa-apa"},{kr:"친구",rom:"chingu",id:"teman"},{kr:"학교",rom:"hakgyo",id:"sekolah"},{kr:"물",rom:"mul",id:"air"},{kr:"밥",rom:"bap",id:"nasi/makanan"},{kr:"사과",rom:"sagwa",id:"apel"},{kr:"시간",rom:"sigan",id:"waktu"},{kr:"집",rom:"jip",id:"rumah"},{kr:"사람",rom:"saram",id:"orang"}];
-const basePhrases=[{kr:"저는 인도네시아 사람입니다.",rom:"jeoneun indonesia saramimnida.",id:"Saya orang Indonesia."},{kr:"천천히 말해 주세요.",rom:"cheoncheonhi malhae juseyo.",id:"Tolong bicara pelan-pelan."},{kr:"화장실이 어디예요?",rom:"hwajangsil-i eodi-yeyo?",id:"Di mana toilet?"},{kr:"도와줄 수 있어요?",rom:"dowajul su isseoyo?",id:"Bisakah bantu saya?"},{kr:"사진 찍어도 돼요?",rom:"sajin jjigeodo dwaeyo?",id:"Boleh ambil foto?"},{kr:"괜찮으세요?",rom:"gwaenchan-euseyo?",id:"Anda tidak apa-apa?"},{kr:"가격을 깎아 주세요.",rom:"gagyeogeul kkagga juseyo.",id:"Tolong kurangi harganya."}];
-const LS={v:"kmc_vocab_v2",p:"kmc_phrases_v2",src:"kmc_src_v2"};
+/* ===================== DATASET LEBIH BANYAK ===================== */
+const baseVocab=[
+  {kr:"안녕하세요",rom:"annyeonghaseyo",id:"halo/permisi"},
+  {kr:"감사합니다",rom:"gamsahamnida",id:"terima kasih"},
+  {kr:"사랑해",rom:"saranghae",id:"aku cinta kamu"},
+  {kr:"네",rom:"ne",id:"iya"},
+  {kr:"아니요",rom:"aniyo",id:"tidak"},
+  {kr:"미안해요",rom:"mianhaeyo",id:"maaf"},
+  {kr:"주세요",rom:"juseyo",id:"tolong berikan"},
+  {kr:"얼마예요?",rom:"eolmayeyo?",id:"berapa harganya?"},
+  {kr:"맛있어요",rom:"masisseoyo",id:"enak"},
+  {kr:"괜찮아요",rom:"gwaenchanayo",id:"tidak apa-apa"},
+  {kr:"친구",rom:"chingu",id:"teman"},
+  {kr:"학교",rom:"hakgyo",id:"sekolah"},
+  {kr:"물",rom:"mul",id:"air"},
+  {kr:"밥",rom:"bap",id:"nasi/makanan"},
+  {kr:"사과",rom:"sagwa",id:"apel"},
+  {kr:"시간",rom:"sigan",id:"waktu"},
+  {kr:"집",rom:"jip",id:"rumah"},
+  {kr:"사람",rom:"saram",id:"orang"},
+  {kr:"의사",rom:"uisa",id:"dokter"},
+  {kr:"병원",rom:"byeongwon",id:"rumah sakit"},
+  {kr:"버스",rom:"beoseu",id:"bus"},
+  {kr:"지하철",rom:"jihacheol",id:"kereta bawah tanah"},
+  {kr:"택시",rom:"taegsi",id:"taksi"},
+  {kr:"시장",rom:"sijang",id:"pasar"},
+  {kr:"가게",rom:"gage",id:"toko"},
+  {kr:"공원",rom:"gongwon",id:"taman"},
+  {kr:"은행",rom:"eunhaeng",id:"bank"},
+  {kr:"돈",rom:"don",id:"uang"},
+  {kr:"가격",rom:"gagyeok",id:"harga"},
+  {kr:"영수증",rom:"yeongsujeung",id:"struk"},
+  {kr:"카드",rom:"kadeu",id:"kartu"},
+  {kr:"현금",rom:"hyeongeum",id:"tunai"},
+  {kr:"어디",rom:"eodi",id:"di mana"},
+  {kr:"왜",rom:"wae",id:"kenapa"},
+  {kr:"언제",rom:"eonje",id:"kapan"},
+  {kr:"무엇",rom:"mueot",id:"apa"},
+  {kr:"누구",rom:"nugu",id:"siapa"},
+  {kr:"많이",rom:"mani",id:"banyak"},
+  {kr:"조금",rom:"jogeum",id:"sedikit"},
+  {kr:"매우",rom:"maeu",id:"sangat"},
+  {kr:"더",rom:"deo",id:"lebih"},
+  {kr:"덜",rom:"deol",id:"kurang"},
+  {kr:"왼쪽",rom:"oenjjok",id:"kiri"},
+  {kr:"오른쪽",rom:"oreunjjok",id:"kanan"},
+  {kr:"앞",rom:"ap",id:"depan"},
+  {kr:"뒤",rom:"dwi",id:"belakang"},
+  {kr:"위",rom:"wi",id:"atas"},
+  {kr:"아래",rom:"arae",id:"bawah"},
+  {kr:"오늘",rom:"oneul",id:"hari ini"},
+  {kr:"내일",rom:"nae-il",id:"besok"},
+  {kr:"어제",rom:"eoje",id:"kemarin"},
+  {kr:"지금",rom:"jigeum",id:"sekarang"},
+  {kr:"천천히",rom:"cheoncheonhi",id:"pelan-pelan"},
+  {kr:"빨리",rom:"ppalli",id:"cepat"},
+  {kr:"괜찮습니다",rom:"gwaenchanseumnida",id:"tidak apa-apa (formal)"},
+  {kr:"도와주세요",rom:"dowajuseyo",id:"tolong bantu"},
+  {kr:"가능해요",rom:"ganeunghaeyo",id:"bisa"},
+  {kr:"불가능해요",rom:"bulganeunghaeyo",id:"tidak bisa"},
+  {kr:"입구",rom:"ipgu",id:"pintu masuk"},
+  {kr:"출구",rom:"chulgu",id:"pintu keluar"},
+  {kr:"화장실",rom:"hwajangsil",id:"toilet"},
+  {kr:"식당",rom:"sikdang",id:"restoran"},
+  {kr:"메뉴",rom:"menyu",id:"menu"},
+  {kr:"추천",rom:"chucheon",id:"rekomendasi"},
+  {kr:"물건",rom:"mulgeon",id:"barang"},
+  {kr:"휴대폰",rom:"hyudaepon",id:"HP"},
+  {kr:"열쇠",rom:"yeolsoe",id:"kunci"},
+  {kr:"호텔",rom:"hotel",id:"hotel"},
+  {kr:"예약",rom:"yeyak",id:"reservasi"}
+];
+const basePhrases=[
+  {kr:"저는 인도네시아 사람입니다.",rom:"jeoneun indonesia saramimnida.",id:"Saya orang Indonesia."},
+  {kr:"천천히 말해 주세요.",rom:"cheoncheonhi malhae juseyo.",id:"Tolong bicara pelan-pelan."},
+  {kr:"화장실이 어디예요?",rom:"hwajangsil-i eodi-yeyo?",id:"Di mana toilet?"},
+  {kr:"도와줄 수 있어요?",rom:"dowajul su isseoyo?",id:"Bisakah bantu saya?"},
+  {kr:"사진 찍어도 돼요?",rom:"sajin jjigeodo dwaeyo?",id:"Boleh ambil foto?"},
+  {kr:"가격을 깎아 주세요.",rom:"gagyeogeul kkagga juseyo.",id:"Tolong kurangi harganya."},
+  {kr:"영수증 주세요.",rom:"yeongsujeung juseyo.",id:"Minta struknya."},
+  {kr:"신용카드로 결제할게요.",rom:"sinyongkadeuro gyeoljjehalgeyo.",id:"Saya bayar pakai kartu."},
+  {kr:"현금만 돼요?",rom:"hyeongeumman dwaeyo?",id:"Hanya tunai?"},
+  {kr:"추천 메뉴가 뭐예요?",rom:"chucheon menyuga mwoyeyo?",id:"Menu rekomendasinya apa?"},
+  {kr:"맵지 않게 해 주세요.",rom:"maepji anke hae juseyo.",id:"Tolong jangan pedas."},
+  {kr:"테이크아웃 할게요.",rom:"teikeuaut halgeyo.",id:"Saya bungkus ya."},
+  {kr:"길을 잃었어요.",rom:"gireul ilheosseoyo.",id:"Saya tersesat."},
+  {kr:"왼쪽으로 가세요.",rom:"oenjjogeuro gaseyo.",id:"Pergi ke kiri."},
+  {kr:"오른쪽으로 가세요.",rom:"oreunjjogeuro gaseyo.",id:"Pergi ke kanan."},
+  {kr:"몇 시에 열어요?",rom:"myeot sie yeoreoyo?",id:"Buka jam berapa?"},
+  {kr:"예약했어요.",rom:"yeyakhaesseoyo.",id:"Saya sudah reservasi."},
+  {kr:"체크인 하고 싶어요.",rom:"chekeuin hago sipeoyo.",id:"Saya ingin check-in."},
+  {kr:"방을 바꿔 주세요.",rom:"bangeul bakkwo juseyo.",id:"Tolong ganti kamar."},
+  {kr:"사진 같이 찍을까요?",rom:"sajin gachi jjigeulkkayo?",id:"Boleh foto bareng?"},
+  {kr:"정말 고마워요.",rom:"jeongmal gomawoyo.",id:"Terima kasih banyak."},
+  {kr:"죄송합니다.",rom:"joesonghamnida",id:"Mohon maaf."},
+  {kr:"괜찮으세요?",rom:"gwaenchan-euseyo?",id:"Anda tidak apa-apa?"},
+  {kr:"다시 한 번 말해 주세요.",rom:"dasi han beon malhae juseyo.",id:"Tolong ulangi sekali lagi."},
+  {kr:"천천히 써 주세요.",rom:"cheoncheonhi sseo juseyo.",id:"Tolong tulis pelan-pelan."},
+  {kr:"입구는 어디예요?",rom:"ipguneun eodiyeyo?",id:"Di mana pintu masuk?"},
+  {kr:"출구는 어디예요?",rom:"chulguneun eodiyeyo?",id:"Di mana pintu keluar?"},
+  {kr:"이거 잃어버렸어요.",rom:"igeo ilheobeoryeosseoyo.",id:"Saya kehilangan ini."},
+  {kr:"사진 보내 주실 수 있어요?",rom:"sajin bonae jusil su isseoyo?",id:"Bisa kirim fotonya?"},
+  {kr:"택시 불러 주세요.",rom:"taegsi bulleojuseyo.",id:"Tolong panggil taksi."},
+  {kr:"얼마나 걸려요?",rom:"eolmana geollyeoyo?",id:"Butuh waktu berapa lama?"},
+  {kr:"지금 출발해요.",rom:"jigeum chulbalhaeyo.",id:"Berangkat sekarang."},
+  {kr:"도착하면 연락해 주세요.",rom:"dochakhameon yeollakhae juseyo.",id:"Kalau sudah sampai kabari ya."},
+  {kr:"사진 올려도 돼요?",rom:"sajin ollyeodo dwaeyo?",id:"Boleh unggah fotonya?"}
+];
+
+/* ===================== STORAGE + UTIL ===================== */
+const LS={v:"km_duel_vocab",p:"km_duel_phr",src:"km_duel_src"};
 const $=s=>document.querySelector(s);
 const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 const vibrate=ms=>{if(navigator.vibrate) navigator.vibrate(ms)};
@@ -243,8 +295,10 @@ function speak(t,lang="ko-KR"){try{const u=new SpeechSynthesisUtterance(t);u.lan
 const load=(k,f)=>{try{return JSON.parse(localStorage.getItem(k))??f}catch(e){return f}};
 const save=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 
-/* ========= STATE ========= */
+/* ===================== STATE & ELEMENTS ===================== */
 let mode="quiz", pool=[], idx=0, right=0, wrong=0, streak=0;
+let p1={name:"Pemain 1",score:0}, p2={name:"Pemain 2",score:0}, turn=1;
+
 const el={
   tabQuiz:$("#tab-quiz"), tabFlash:$("#tab-flash"), tabCustom:$("#tab-custom"),
   pQuiz:$("#panel-quiz"), pFlash:$("#panel-flash"), pCustom:$("#panel-custom"),
@@ -254,31 +308,35 @@ const el={
   speakQ:$("#speakQuiz"), hintBtn:$("#btnHint"), hangulHint:$("#hangulHint"), nextQ:$("#nextQ"),
   flash:$("#flash"), fFront:$("#flashFront"), fMean:$("#meanBack"), fHan:$("#hangulBack"),
   fPrev:$("#prevCard"), fNext:$("#nextCard"), fSpeak:$("#speakFlash"), cIndex:$("#cardIndex"), cTotal:$("#cardTotal"),
-  inRom:$("#inRom"), inHan:$("#inHan"), inInd:$("#inInd"), inCat:$("#inCat"), add:$("#btnAdd")
+  inRom:$("#inRom"), inHan:$("#inHan"), inInd:$("#inInd"), inCat:$("#inCat"), add:$("#btnAdd"),
+  p1name:$("#p1name"), p2name:$("#p2name"), p1label:$("#p1label"), p2label:$("#p2label"),
+  p1score:$("#p1score"), p2score:$("#p2score"), turnName:$("#turnName"), strictTurn:$("#strictTurn")
 };
 el.src.value = load(LS.src,"base"); updateSrcTag();
 
-/* ========= EVENT ========= */
-[el.tabQuiz,el.tabFlash,el.tabCustom].forEach(btn=>
-  btn.addEventListener("click",()=>switchMode(btn.id.replace("tab-","")))
-);
-el.start.addEventListener("click", resetGame);
+/* ===================== EVENTS ===================== */
+[el.tabQuiz,el.tabFlash,el.tabCustom].forEach(b=>b.addEventListener("click",()=>switchMode(b.id.replace("tab-",""))));
 el.limit.addEventListener("change",()=>el.target.textContent=el.limit.value);
 el.src.addEventListener("change",()=>{save(LS.src,el.src.value);updateSrcTag();resetGame()});
 el.hintBtn.addEventListener("click",()=>{toggle(el.hangulHint)});
 el.speakQ.addEventListener("click",()=>speak(pool[idx].kr));
-el.nextQ.addEventListener("click",()=>{ if(idx<pool.length-1){idx++; renderQuiz(); v()} });
-el.flash.addEventListener("click",()=>{ el.flash.classList.toggle("flipped"); v(20) });
-el.fPrev.addEventListener("click",()=>{ if(idx>0){idx--; renderFlash(); v()} });
-el.fNext.addEventListener("click",()=>{ if(idx<pool.length-1){idx++; renderFlash(); v()} });
+el.nextQ.addEventListener("click",()=>{ nextTurn(); if(idx<pool.length-1){idx++; renderQuiz();} else {finish()} });
+el.flash.addEventListener("click",()=>{ el.flash.classList.toggle("flipped"); vibrate(20) });
+el.fPrev.addEventListener("click",()=>{ if(idx>0){idx--; renderFlash()} });
+el.fNext.addEventListener("click",()=>{ if(idx<pool.length-1){idx++; renderFlash()} });
 el.fSpeak.addEventListener("click",()=>speak(pool[idx].kr));
 el.add.addEventListener("click", addCustom);
+el.p1name.addEventListener("input",()=>{p1.name=el.p1name.value.trim()||"Pemain 1"; refreshNames()});
+el.p2name.addEventListener("input",()=>{p2.name=el.p2name.value.trim()||"Pemain 2"; refreshNames()});
+$("#btnStart").addEventListener("click", resetGame);
 
-function v(ms=30){vibrate(ms)}
-function toggle(n){n.style.display = (n.style.display==="none"||!n.style.display) ? "block":"none"}
+function toggle(n){n.style.display=(n.style.display==="none"||!n.style.display)?"block":"none"}
 function updateSrcTag(){ el.srcTag.textContent = el.src.value==="base"?"Bawaan":el.src.value==="merge"?"Gabung":"Hanya Custom" }
+function refreshNames(){
+  el.p1label.textContent=p1.name; el.p2label.textContent=p2.name; el.turnName.textContent = (turn===1?p1.name:p2.name);
+}
 
-/* ========= DATASET ========= */
+/* ===================== DATA ===================== */
 function custom(){ return {v:load(LS.v,[]), p:load(LS.p,[])} }
 function dataset(){
   const src=el.src.value, cat=el.cat.value, c=custom();
@@ -289,17 +347,45 @@ function dataset(){
   return arr.map(x=>({q:x.rom,a:x.id,rom:x.rom,kr:x.kr,id:x.id}));
 }
 
-/* ========= GAME FLOW ========= */
+/* ===================== GAME FLOW ===================== */
 function resetGame(){
+  // reset skor & giliran
+  p1.score=p2.score=0; turn=1; refreshNames();
+  el.p1score.textContent=0; el.p2score.textContent=0;
+
   right=wrong=streak=0; idx=0;
   el.right.textContent=0; el.wrong.textContent=0; el.streak.textContent=0;
   el.target.textContent=el.limit.value;
 
   const data=dataset();
   pool = shuffle([...data]).slice(0, Math.min(+el.limit.value, data.length));
-  $("#cardTotal").textContent = pool.length; $("#qTotal").textContent = pool.length;
+  el.cTotal.textContent = pool.length; el.qTotal.textContent = pool.length;
+
   if(pool.length===0){ alert("Dataset kosong. Tambah data di tab Kustom atau ganti Sumber Data."); return;}
   mode==="quiz" ? renderQuiz() : renderFlash();
+}
+function nextTurn(){
+  if(el.strictTurn.checked){ turn = (turn===1?2:1); refreshNames(); }
+}
+function answer(op){
+  const it=pool[idx];
+  const correct = (op===it.a);
+  if(correct){ right++; streak++; if(turn===1) p1.score++; else p2.score++; vibrate(40); }
+  else{ wrong++; streak=0; vibrate([20,40,20]); }
+  el.right.textContent=right; el.wrong.textContent=wrong; el.streak.textContent=streak;
+  el.p1score.textContent=p1.score; el.p2score.textContent=p2.score;
+
+  // highlight
+  [...el.choices.children].forEach(c=>c.dataset.lock=1);
+  const clicked = [...el.choices.children].find(x=>x.textContent===op);
+  if(clicked) clicked.classList.add(correct?"correct":"wrong");
+  [...el.choices.children].find(x=>x.textContent===it.a)?.classList.add("correct");
+
+  // pindah
+  setTimeout(()=>{
+    nextTurn();
+    if(idx<pool.length-1){idx++; renderQuiz();} else {finish()}
+  }, 650);
 }
 function renderQuiz(){
   const it=pool[idx];
@@ -307,50 +393,46 @@ function renderQuiz(){
   el.q.textContent=it.q;
   el.hangulHint.textContent=it.kr;
   el.hangulHint.style.display = el.hide.checked ? "none":"block";
-  // options: 1 benar + 3 salah
+
+  // opsi
   const others = shuffle(dataset().filter(x=>x.a!==it.a)).slice(0,3);
   const options = shuffle([it.a, ...others.map(o=>o.a)]);
   el.choices.innerHTML="";
   options.forEach(op=>{
     const b=document.createElement("button");
     b.className="choice"; b.textContent=op;
-    b.addEventListener("click",()=>{
-      if(b.dataset.lock) return; [...el.choices.children].forEach(c=>c.dataset.lock=1);
-      if(op===it.a){ b.classList.add("correct"); right++; streak++; v(40);}
-      else{ b.classList.add("wrong"); streak=0; wrong++; v([20,40,20]); [...el.choices.children].find(x=>x.textContent===it.a)?.classList.add("correct");}
-      el.right.textContent=right; el.wrong.textContent=wrong; el.streak.textContent=streak;
-      if(idx<pool.length-1) setTimeout(()=>{idx++; renderQuiz()},650); else setTimeout(done,450);
-    });
+    b.addEventListener("click",()=>{ if(b.dataset.lock) return; answer(op); });
     el.choices.appendChild(b);
   });
+
+  // indikator giliran (warna dot)
+  el.turnName.textContent = (turn===1?p1.name:p2.name);
+  document.querySelector(".turn .dot").className = "dot " + (turn===1?"p1":"p2");
 }
 function renderFlash(){
   const it=pool[idx];
   el.cIndex.textContent=idx+1;
   el.flash.classList.remove("flipped");
-  el.fFront.textContent=it.rom;
-  el.fMean.textContent=it.id;
-  el.fHan.textContent=it.kr;
+  el.fFront.textContent=it.rom; el.fMean.textContent=it.id; el.fHan.textContent=it.kr;
   el.fHan.style.display = el.hide.checked ? "none":"block";
 }
-function done(){
+function finish(){
   const total=pool.length, score=Math.round((right/total)*100);
-  alert(`Selesai!\nSkor: ${score}%\nBenar: ${right} | Salah: ${wrong}\n🔥 Streak: ${streak}`);
+  let winner="Seri! 🎉";
+  if(p1.score>p2.score) winner=`Pemenang: ${p1.name} 🏆`;
+  else if(p2.score>p1.score) winner=`Pemenang: ${p2.name} 🏆`;
+  alert(`${winner}\n\nSkor Akhir\n${p1.name}: ${p1.score}\n${p2.name}: ${p2.score}\n\nAkurasi tim: ${score}% (Benar ${right} / ${total})`);
 }
 
-/* ========= MODE ========= */
+/* ===================== MODE & CUSTOM ===================== */
 function switchMode(m){
-  mode=m; // "quiz" | "flash" | "custom"
+  mode=m;
   el.tabQuiz.setAttribute("aria-pressed", m==="quiz");
   el.tabFlash.setAttribute("aria-pressed", m==="flash");
   el.tabCustom.setAttribute("aria-pressed", m==="custom");
-  el.pQuiz.hidden = m!=="quiz";
-  el.pFlash.hidden = m!=="flash";
-  el.pCustom.hidden= m!=="custom";
+  el.pQuiz.hidden = m!=="quiz"; el.pFlash.hidden = m!=="flash"; el.pCustom.hidden = m!=="custom";
   if(m!=="custom") resetGame();
 }
-
-/* ========= CUSTOM ========= */
 function addCustom(){
   const rom=el.inRom.value.trim(), kr=el.inHan.value.trim(), id=el.inInd.value.trim();
   if(!rom||!kr||!id){ alert("Isi romaja, hangul, dan arti."); return; }
@@ -362,7 +444,7 @@ function addCustom(){
 }
 
 /* boot */
-switchMode("quiz");
+switchMode("quiz"); p1.name=el.p1name.value; p2.name=el.p2name.value; refreshNames();
 </script>
 </body>
 </html>
