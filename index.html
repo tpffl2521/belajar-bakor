@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Game Korea — Romaja + Custom Dataset</title>
+<style>
+  :root{
+    --bg1:#fdf2f8; --bg2:#eff6ff; --card:#ffffff; --text:#0f172a;
+    --accent:#fb7185; --accent2:#60a5fa; --good:#22c55e; --bad:#ef4444;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;
+    color:var(--text);
+    background: radial-gradient(1200px 800px at 10% 0%, var(--bg1), transparent 70%),
+                radial-gradient(1000px 700px at 100% 0%, var(--bg2), transparent 70%),
+                #fff;
+  }
+  .wrap{max-width:1000px;margin:auto;padding:16px;min-height:100svh}
+  header{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:12px 16px;background:var(--card);border-radius:18px;
+    box-shadow:0 8px 30px rgba(2,6,23,.08);position:sticky;top:8px;z-index:5
+  }
+  h1{font-size:20px;margin:0}
+  .pill{display:inline-flex;gap:8px;background:#00000008;border-radius:999px;padding:6px}
+  .pill button{
+    border:0;background:transparent;padding:8px 14px;border-radius:999px;
+    font-weight:600;cursor:pointer
+  }
+  .pill button[aria-pressed="true"]{background:var(--accent);color:#fff}
+  .grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:14px}
+  @media(min-width:960px){.grid{grid-template-columns:1.2fr .8fr}}
+  .card{
+    background:var(--card);border-radius:18px;padding:16px;
+    box-shadow:0 10px 30px rgba(2,6,23,.06)
+  }
+  .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  .select,.btn,.input,.textarea{
+    appearance:none;border:2px solid #00000010;border-radius:12px;
+    padding:10px 12px;font-weight:600;background:#fff
+  }
+  .input,.textarea{font-weight:500}
+  .textarea{width:100%;min-height:110px;resize:vertical}
+  .btn{cursor:pointer}
+  .btn.primary{background:var(--accent);color:#fff;border-color:transparent}
+  .btn.ghost{background:#0000}
+  .btn.warn{background:#fee2e2;border-color:#fecaca}
+  .stat{display:flex;gap:10px;font-size:14px;opacity:.85;flex-wrap:wrap}
+  .big{font-size:36px;line-height:1.25;text-align:center;padding:20px 12px}
+  .flip{perspective:1000px;cursor:pointer}
+  .flip-inner{
+    position:relative;transform-style:preserve-3d;transition:transform .5s;
+    min-height:170px;display:grid;place-items:center;border-radius:16px;background:#fff
+  }
+  .flip.flipped .flip-inner{transform:rotateY(180deg)}
+  .face{position:absolute;inset:0;display:grid;place-items:center;padding:22px;backface-visibility:hidden;border-radius:16px}
+  .front{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+  .back{background:#fff;transform:rotateY(180deg);border:2px dashed #00000015}
+  .choices{display:grid;gap:10px;margin-top:12px}
+  .choices button{
+    text-align:left;border:2px solid #00000010;background:#fff;border-radius:12px;
+    padding:12px;font-size:16px;cursor:pointer
+  }
+  .choices button.correct{border-color:var(--good)}
+  .choices button.wrong{border-color:var(--bad)}
+  .tiny{font-size:12px;opacity:.75}
+  .footer{display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:12px;flex-wrap:wrap}
+  .tag{font:600 12px/1 system-ui;background:#00000008;border-radius:999px;padding:6px 10px}
+  .hint{display:inline-flex;gap:8px;align-items:center}
+  .muted{opacity:.7}
+  .table{width:100%;border-collapse:separate;border-spacing:0 8px}
+  .table th{font-size:12px;text-align:left;opacity:.7;padding:0 8px}
+  .table td{background:#fff;border:2px solid #0000000e;padding:8px;border-radius:10px}
+  .chip{display:inline-block;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:999px;padding:4px 10px;font:600 12px/1 system-ui}
+  .stack-sm{display:flex;gap:8px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🎌 Korea Mini — Romaja + Custom</h1>
+    <div class="pill" role="tablist" aria-label="Mode">
+      <button id="tab-flash" role="tab" aria-pressed="true">Flashcard</button>
+      <button id="tab-quiz" role="tab" aria-pressed="false">Kuis</button>
+      <button id="tab-custom" role="tab" aria-pressed="false">Kustom Data</button>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- PANEL PERMAINAN -->
+    <section class="card">
+      <div class="row">
+        <label>
+          <span class="tiny">Kategori</span><br/>
+          <select id="category" class="select">
+            <option value="vocab" selected>Kosakata</option>
+            <option value="phrases">Frasa / Kalimat</option>
+          </select>
+        </label>
+        <label>
+          <span class="tiny">Sumber Data</span><br/>
+          <select id="datasrc" class="select" title="Pilih sumber data">
+            <option value="base" selected>Data Bawaan</option>
+            <option value="merge">Gabung (Bawaan + Custom)</option>
+            <option value="custom">Hanya Custom</option>
+          </select>
+        </label>
+        <label>
+          <span class="tiny">Jumlah Soal</span><br/>
+          <select id="limit" class="select">
+            <option>10</option><option selected>15</option><option>20</option>
+          </select>
+        </label>
+        <label class="hint" title="Sembunyikan tulisan Hangul, dapat ditampilkan sebagai hint">
+          <input type="checkbox" id="hideHangul" checked />
+          <span class="tiny">Sembunyikan Hangul</span>
+        </label>
+        <button id="btnStart" class="btn primary">Mulai / Reset</button>
+      </div>
+
+      <div class="stat" style="margin-top:10px">
+        <span>✅ Benar: <b id="right">0</b></span>
+        <span>❌ Salah: <b id="wrong">0</b></span>
+        <span>🔥 Streak: <b id="streak">0</b></span>
+        <span>🎯 Target: <b id="target">15</b></span>
+        <span class="chip">Sumber aktif: <span id="activeSrc">Bawaan</span></span>
+      </div>
+
+      <!-- FLASHCARD -->
+      <div id="panel-flash" class="card" style="margin-top:12px">
+        <div class="tag">Flashcard ▸ Romaja → Arti <span class="muted">(ketuk untuk membalik)</span></div>
+        <div class="flip" id="flash">
+          <div class="flip-inner">
+            <div class="face front">
+              <div class="big" id="flashFront">annyeonghaseyo</div>
+            </div>
+            <div class="face back">
+              <div class="big" id="flashBack">
+                <div><b id="meanBack">halo/permisi</b></div>
+                <div class="tiny" id="hangulBack" style="margin-top:8px">안녕하세요</div>
+                <div style="margin-top:8px" class="stack-sm">
+                  <button id="speakFlash" class="btn">🔊 Dengar Pelafalan</button>
+                  <button id="hintHangulFlash" class="btn ghost">💡 Tampilkan Hangul</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="footer">
+          <div class="tiny">Kartu <span id="cardIndex">1</span>/<span id="cardTotal">15</span></div>
+          <div class="stack-sm">
+            <button id="prevCard" class="btn ghost">⟵ Sebelum</button>
+            <button id="nextCard" class="btn ghost">Berikutnya ⟶</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- KUIS -->
+      <div id="panel-quiz" class="card" hidden style="margin-top:12px">
+        <div class="tag">Kuis ▸ Pilih arti Indonesia</div>
+        <div class="big" id="question">annyeonghaseyo</div>
+        <div class="choices" id="choices"></div>
+        <div class="footer">
+          <div class="stack-sm">
+            <button id="speakQuiz" class="btn">🔊 Dengar Pelafalan</button>
+            <button id="hintHangulQuiz" class="btn ghost">💡 Tampilkan Hangul</button>
+            <span id="hangulHint" class="tiny" style="display:none">안녕하세요</span>
+          </div>
+          <div class="stack-sm">
+            <span class="tiny">Soal <span id="qIndex">1</span>/<span id="qTotal">15</span></span>
+            <button id="nextQ" class="btn">Soal Berikutnya ⟶</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANEL KUSTOM -->
+    <section id="panel-custom" class="card" hidden>
+      <div class="tag">Kustom Data ▸ Tambah / Impor / Ekspor</div>
+
+      <details open style="margin:8px 0">
+        <summary><b>Tambah Item Cepat</b> (romaja • hangul • arti)</summary>
+        <div class="row" style="margin-top:10px">
+          <input id="inRom" class="input" placeholder="romaja (mis. annyeonghaseyo)" />
+          <input id="inHan" class="input" placeholder="hangul (안녕하세요)" />
+          <input id="inInd" class="input" placeholder="arti (halo/permisi)" />
+          <select id="inCat" class="select">
+            <option value="vocab">Kosakata</option>
+            <option value="phrases">Frasa</option>
+          </select>
+          <button id="btnAdd" class="btn primary">Tambah</button>
+        </div>
+      </details>
+
+      <details style="margin:8px 0">
+        <summary><b>Paste Massal</b> (satu item per baris, format: <i>romaja | hangul | arti</i>)</summary>
+        <textarea id="bulkText" class="textarea" placeholder="contoh:
+annyeong | 안녕 | halo
+gamsahamnida | 감사합니다 | terima kasih
+"></textarea>
+        <div class="row" style="margin-top:8px">
+          <select id="bulkCat" class="select">
+            <option value="vocab">Kosakata</option>
+            <option value="phrases">Frasa</option>
+          </select>
+          <button id="btnImportBulk" class="btn">Impor dari Teks</button>
+        </div>
+      </details>
+
+      <details style="margin:8px 0">
+        <summary><b>Impor/Ekspor JSON</b></summary>
+        <div class="row" style="margin-top:8px">
+          <input id="fileJson" type="file" accept="application/json" class="input" />
+          <button id="btnImportJson" class="btn">Impor JSON</button>
+          <button id="btnExportJson" class="btn">Ekspor JSON</button>
+          <button id="btnClearAll" class="btn warn">Hapus Semua Custom</button>
+        </div>
+        <div class="tiny muted">Skema JSON: {"vocab":[{kr,rom,id}], "phrases":[{kr,rom,id}]}</div>
+      </details>
+
+      <div style="margin-top:10px">
+        <div class="stack-sm">
+          <span class="chip">Kosakata Custom</span>
+          <span class="chip" id="countV">0 item</span>
+        </div>
+        <table class="table" id="tblVocab">
+          <thead><tr><th>Romaja</th><th>Hangul</th><th>Arti</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div style="margin-top:10px">
+        <div class="stack-sm">
+          <span class="chip">Frasa Custom</span>
+          <span class="chip" id="countP">0 item</span>
+        </div>
+        <table class="table" id="tblPhrases">
+          <thead><tr><th>Romaja</th><th>Hangul</th><th>Arti</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <p class="tiny" style="margin-top:18px">
+    💡 Tips: Gunakan <b>Sumber Data</b> untuk memilih <i>Data Bawaan</i>, <i>Gabung</i>, atau <i>Hanya Custom</i>. Semua data custom disimpan otomatis di perangkat (localStorage).
+  </p>
+</div>
+
+<script>
+/* ====================== DATASET BAWAAN (Romaja-first) ====================== */
+const baseVocab = [
+  {kr:"안녕하세요", rom:"annyeonghaseyo", id:"halo/permisi"},
+  {kr:"감사합니다", rom:"gamsahamnida", id:"terima kasih"},
+  {kr:"사랑해",     rom:"saranghae", id:"aku cinta kamu"},
+  {kr:"네",         rom:"ne", id:"iya"},
+  {kr:"아니요",     rom:"aniyo", id:"tidak"},
+  {kr:"미안해요",   rom:"mianhaeyo", id:"maaf"},
+  {kr:"주세요",     rom:"juseyo", id:"tolong berikan"},
+  {kr:"얼마예요?",   rom:"eolmayeyo?", id:"berapa harganya?"},
+  {kr:"맛있어요",   rom:"masisseoyo", id:"enak"},
+  {kr:"괜찮아요",   rom:"gwaenchanayo", id:"tidak apa-apa"},
+  {kr:"친구",       rom:"chingu", id:"teman"},
+  {kr:"학교",       rom:"hakgyo", id:"sekolah"},
+  {kr:"물",         rom:"mul", id:"air"},
+  {kr:"밥",         rom:"bap", id:"nasi/makanan"},
+  {kr:"사과",       rom:"sagwa", id:"apel"},
+  {kr:"시간",       rom:"sigan", id:"waktu"},
+  {kr:"집",         rom:"jip", id:"rumah"},
+  {kr:"사람",       rom:"saram", id:"orang"},
+];
+const basePhrases = [
+  {kr:"저는 인도네시아 사람입니다.", rom:"jeoneun indonesia saramimnida.", id:"Saya orang Indonesia."},
+  {kr:"천천히 말해 주세요.", rom:"cheoncheonhi malhae juseyo.", id:"Tolong bicara pelan-pelan."},
+  {kr:"화장실이 어디예요?", rom:"hwajangsil-i eodi-yeyo?", id:"Di mana toilet?"},
+  {kr:"도와줄 수 있어요?", rom:"dowajul su isseoyo?", id:"Bisakah bantu saya?"},
+  {kr:"사진 찍어도 돼요?", rom:"sajin jjigeodo dwaeyo?", id:"Boleh ambil foto?"},
+  {kr:"괜찮으세요?", rom:"gwaenchan-euseyo?", id:"Anda tidak apa-apa?"},
+  {kr:"가격을 깎아 주세요.", rom:"gagyeogeul kkagga juseyo.", id:"Tolong kurangi harganya."},
+];
+
+/* ====================== STORAGE (localStorage) ====================== */
+const LS_KEYS = {
+  vocab: "korean_custom_vocab_v1",
+  phrases: "korean_custom_phrases_v1",
+  dataSrc: "korean_data_source_v1"
+};
+function loadLS(key, fallback){ try{ return JSON.parse(localStorage.getItem(key)) ?? fallback; }catch(e){ return fallback; } }
+function saveLS(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
+
+/* ====================== UTIL ====================== */
+const $ = s => document.querySelector(s);
+function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]] } return arr; }
+function vibrate(ms=30){ if(navigator.vibrate) navigator.vibrate(ms); }
+function speak(text, lang="ko-KR"){
+  try{
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = lang; u.rate = 0.95; u.pitch = 1; u.volume = 1;
+    speechSynthesis.cancel(); speechSynthesis.speak(u);
+  }catch(e){ alert("Text-to-speech tidak didukung di perangkat ini."); }
+}
+function csvLineToItem(line){
+  const parts = line.split("|").map(s=>s.trim()).filter(Boolean);
+  if(parts.length<3) return null;
+  return {rom:parts[0], kr:parts[1], id:parts[2]};
+}
+function sanitizeItems(list){
+  return list.filter(x => x && x.rom && x.kr && x.id);
+}
+
+/* ====================== STATE & ELEMENTS ====================== */
+let mode="flash"; // flash | quiz | custom
+let pool=[], idx=0, right=0, wrong=0, streak=0;
+
+const tabFlash = $("#tab-flash"), tabQuiz=$("#tab-quiz"), tabCustom=$("#tab-custom");
+const panelFlash=$("#panel-flash"), panelQuiz=$("#panel-quiz"), panelCustom=$("#panel-custom");
+const category=$("#category"), limit=$("#limit"), hideHangulEl=$("#hideHangul"), dataSrc=$("#datasrc");
+const btnStart=$("#btnStart"); const rightEl=$("#right"), wrongEl=$("#wrong"), streakEl=$("#streak"), targetEl=$("#target");
+const activeSrcEl=$("#activeSrc");
+
+/* Flash elements */
+const flash=$("#flash"), flashFront=$("#flashFront"), meanBack=$("#meanBack"), hangulBack=$("#hangulBack");
+const speakFlashBtn=$("#speakFlash"), hintHangulFlash=$("#hintHangulFlash");
+const cardIndex=$("#cardIndex");
+$("#prevCard").addEventListener("click",()=>{ if(idx>0){ idx--; renderFlash(); } vibrate(); });
+$("#nextCard").addEventListener("click",()=>{ if(idx<pool.length-1){ idx++; renderFlash(); } vibrate(); });
+flash.addEventListener("click",()=>{ flash.classList.toggle("flipped"); vibrate(20); });
+hintHangulFlash.addEventListener("click", ()=>{ hangulBack.style.display = (hangulBack.style.display==="none") ? "block" : "none"; });
+speakFlashBtn.addEventListener("click", ()=>{ speak(pool[idx].kr); });
+
+/* Quiz elements */
+const qEl=$("#question"), choicesEl=$("#choices"), qIndexEl=$("#qIndex");
+const nextQ=$("#nextQ"), speakQuizBtn=$("#speakQuiz"), hintHangulQuizBtn=$("#hintHangulQuiz"), hangulHint=$("#hangulHint");
+nextQ.addEventListener("click", ()=>{ if(idx<pool.length-1){ idx++; renderQuiz(); vibrate(); } });
+speakQuizBtn.addEventListener("click", ()=>{ speak(pool[idx].kr); });
+hintHangulQuizBtn.addEventListener("click", ()=>{ hangulHint.style.display = (hangulHint.style.display==="none") ? "inline" : "none"; });
+
+/* Custom panel elements */
+const inRom=$("#inRom"), inHan=$("#inHan"), inInd=$("#inInd"), inCat=$("#inCat");
+const btnAdd=$("#btnAdd"), bulkText=$("#bulkText"), bulkCat=$("#bulkCat");
+const btnImportBulk=$("#btnImportBulk"), fileJson=$("#fileJson"), btnImportJson=$("#btnImportJson");
+const btnExportJson=$("#btnExportJson"), btnClearAll=$("#btnClearAll");
+const tblVocab=$("#tblVocab tbody"), tblPhrases=$("#tblPhrases tbody"), countV=$("#countV"), countP=$("#countP");
+
+/* ====================== INIT ====================== */
+dataSrc.value = loadLS(LS_KEYS.dataSrc, "base");
+updateActiveSrcLabel();
+tabFlash.addEventListener("click",()=>switchMode("flash"));
+tabQuiz.addEventListener("click",()=>switchMode("quiz"));
+tabCustom.addEventListener("click",()=>switchMode("custom"));
+btnStart.addEventListener("click", resetGame);
+limit.addEventListener("change", ()=>{ targetEl.textContent=limit.value; });
+dataSrc.addEventListener("change", ()=>{ saveLS(LS_KEYS.dataSrc, dataSrc.value); updateActiveSrcLabel(); resetGame(); });
+
+renderTables(); // show custom items initially
+switchMode("flash"); // boot
+
+function updateActiveSrcLabel(){
+  activeSrcEl.textContent = dataSrc.value==="base" ? "Bawaan" : dataSrc.value==="merge" ? "Gabung" : "Hanya Custom";
+}
+
+/* ====================== DATASET BUILDER ====================== */
+function getCustom(){
+  return {
+    vocab: loadLS(LS_KEYS.vocab, []),
+    phrases: loadLS(LS_KEYS.phrases, [])
+  };
+}
+function setCustom(obj){
+  saveLS(LS_KEYS.vocab, sanitizeItems(obj.vocab||[]));
+  saveLS(LS_KEYS.phrases, sanitizeItems(obj.phrases||[]));
+  renderTables();
+}
+function getDataset(){
+  const src = dataSrc.value; // base | merge | custom
+  const cat = category.value; // vocab | phrases
+  const custom = getCustom();
+  let arr = [];
+  if(src==="base") arr = (cat==="vocab"? baseVocab : basePhrases);
+  else if(src==="custom") arr = (cat==="vocab"? custom.vocab : custom.phrases);
+  else { // merge
+    arr = (cat==="vocab"? [...baseVocab, ...custom.vocab] : [...basePhrases, ...custom.phrases]);
+  }
+  // Map to game item
+  return arr.map(x=>({ q:x.rom, a:x.id, rom:x.rom, kr:x.kr, id:x.id }));
+}
+
+/* ====================== GAME FLOW ====================== */
+function resetGame(){
+  right=wrong=streak=0; idx=0;
+  rightEl.textContent=right; wrongEl.textContent=wrong; streakEl.textContent=streak;
+  targetEl.textContent=limit.value;
+
+  const dataset = getDataset();
+  const lim = Math.min(Number(limit.value), dataset.length || 0);
+  pool = shuffle(dataset).slice(0, lim);
+
+  $("#cardTotal").textContent = pool.length;
+  $("#qTotal").textContent = pool.length;
+
+  if(pool.length===0){
+    alert("Dataset kosong untuk pilihan ini.\nSilakan tambahkan data custom di tab 'Kustom Data' atau ganti Sumber Data.");
+    return;
+  }
+  if(mode==="flash") renderFlash(); else if(mode==="quiz") renderQuiz();
+}
+
+function renderFlash(){
+  const item = pool[idx];
+  cardIndex.textContent = (idx+1);
+  flash.classList.remove("flipped");
+  flashFront.textContent = item.rom;
+  meanBack.textContent = item.id;
+  hangulBack.textContent = item.kr;
+  hangulBack.style.display = hideHangulEl.checked ? "none" : "block";
+}
+function renderQuiz(){
+  const item = pool[idx];
+  qIndexEl.textContent = idx+1;
+  qEl.textContent = item.q;
+  hangulHint.textContent = item.kr;
+  hangulHint.style.display = hideHangulEl.checked ? "none" : "inline";
+
+  // 1 benar + 3 salah (fallback jika data sedikit)
+  const full = getDataset();
+  const wrongPool = shuffle(full.filter(x=>x.a!==item.a));
+  const needed = Math.max(0, 3);
+  const picks = wrongPool.slice(0, needed);
+  const options = shuffle([item.a, ...picks.map(x=>x.a)]);
+
+  choicesEl.innerHTML = "";
+  options.forEach(opt=>{
+    const b = document.createElement("button");
+    b.textContent = opt;
+    b.addEventListener("click", ()=>{
+      if(b.dataset.locked) return;
+      [...choicesEl.children].forEach(c=>c.dataset.locked=true);
+
+      if(opt===item.a){
+        b.classList.add("correct"); right++; streak++; vibrate(40);
+      }else{
+        b.classList.add("wrong"); wrong++; streak=0; vibrate([20,40,20]);
+        [...choicesEl.children].find(x=>x.textContent===item.a)?.classList.add("correct");
+      }
+      rightEl.textContent=right; wrongEl.textContent=wrong; streakEl.textContent=streak;
+
+      if(idx<pool.length-1){ setTimeout(()=>{ idx++; renderQuiz(); }, 650); }
+      else { setTimeout(()=>finishAlert(), 500); }
+    });
+    choicesEl.appendChild(b);
+  });
+}
+function finishAlert(){
+  const total = pool.length;
+  const score = total ? Math.round((right/total)*100) : 0;
+  alert(`Selesai!\nSkor: ${score}%\nBenar: ${right} | Salah: ${wrong}\n🔥 Streak akhir: ${streak}`);
+}
+
+/* ====================== MODE SWITCH ====================== */
+function switchMode(m){
+  mode = m;
+  tabFlash.setAttribute("aria-pressed", m==="flash");
+  tabQuiz.setAttribute("aria-pressed", m==="quiz");
+  tabCustom.setAttribute("aria-pressed", m==="custom");
+  panelFlash.hidden = m!=="flash";
+  panelQuiz.hidden  = m!=="quiz";
+  panelCustom.hidden= m!=="custom";
+  if(m!=="custom") resetGame();
+}
+
+/* ====================== CUSTOM PANEL LOGIC ====================== */
+function renderTables(){
+  const {vocab, phrases} = getCustom();
+  // Vocab table
+  tblVocab.innerHTML = "";
+  vocab.forEach((x,i)=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML = `<td>${escapeHTML(x.rom)}</td><td>${escapeHTML(x.kr)}</td><td>${escapeHTML(x.id)}</td>
+      <td><button class="btn warn" data-delv="${i}">Hapus</button></td>`;
+    tblVocab.appendChild(tr);
+  });
+  // Phrases table
+  tblPhrases.innerHTML = "";
+  phrases.forEach((x,i)=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML = `<td>${escapeHTML(x.rom)}</td><td>${escapeHTML(x.kr)}</td><td>${escapeHTML(x.id)}</td>
+      <td><button class="btn warn" data-delp="${i}">Hapus</button></td>`;
+    tblPhrases.appendChild(tr);
+  });
+  countV.textContent = `${vocab.length} item`;
+  countP.textContent = `${phrases.length} item`;
+
+  // Bind delete
+  tblVocab.querySelectorAll("[data-delv]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const i=+btn.dataset.delv;
+      const cur=getCustom(); cur.vocab.splice(i,1); setCustom(cur);
+    });
+  });
+  tblPhrases.querySelectorAll("[data-delp]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const i=+btn.dataset.delp;
+      const cur=getCustom(); cur.phrases.splice(i,1); setCustom(cur);
+    });
+  });
+}
+function escapeHTML(s){ return String(s).replace(/[&<>"']/g, m=>({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[m])); }
+
+btnAdd.addEventListener("click", ()=>{
+  const item = {rom:inRom.value.trim(), kr:inHan.value.trim(), id:inInd.value.trim()};
+  if(!item.rom||!item.kr||!item.id){ alert("Mohon isi romaja, hangul, dan arti."); return; }
+  const cur=getCustom();
+  (inCat.value==="vocab" ? cur.vocab : cur.phrases).push(item);
+  setCustom(cur);
+  inRom.value=inHan.value=inInd.value="";
+});
+
+btnImportBulk.addEventListener("click", ()=>{
+  const lines = bulkText.value.split("\n").map(l=>l.trim()).filter(Boolean);
+  const items = sanitizeItems(lines.map(csvLineToItem));
+  if(!items.length){ alert("Tidak ada baris valid. Gunakan format: romaja | hangul | arti"); return; }
+  const cur=getCustom();
+  if(bulkCat.value==="vocab") cur.vocab.push(...items); else cur.phrases.push(...items);
+  setCustom(cur);
+  bulkText.value="";
+  alert(`Berhasil impor ${items.length} item ke ${bulkCat.value}.`);
+});
+
+btnImportJson.addEventListener("click", async ()=>{
+  const f = fileJson.files?.[0]; if(!f){ alert("Pilih file JSON terlebih dahulu."); return; }
+  const text = await f.text();
+  try{
+    const obj = JSON.parse(text);
+    if(!obj || typeof obj!=="object") throw 0;
+    const v = sanitizeItems(obj.vocab||[]);
+    const p = sanitizeItems(obj.phrases||[]);
+    const cur=getCustom();
+    cur.vocab.push(...v); cur.phrases.push(...p);
+    setCustom(cur);
+    alert(`Impor selesai. +${v.length} vocab, +${p.length} frasa.`);
+  }catch(e){ alert("Format JSON tidak valid."); }
+});
+
+btnExportJson.addEventListener("click", ()=>{
+  const cur=getCustom();
+  const blob = new Blob([JSON.stringify(cur, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = Object.assign(document.createElement("a"), {href:url, download:"korean-custom.json"});
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+});
+
+btnClearAll.addEventListener("click", ()=>{
+  if(!confirm("Hapus semua data custom?")) return;
+  localStorage.removeItem(LS_KEYS.vocab);
+  localStorage.removeItem(LS_KEYS.phrases);
+  renderTables();
+  alert("Data custom dihapus.");
+});
+</script>
+</body>
+</html>
